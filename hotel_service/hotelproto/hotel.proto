@@ -33,15 +33,17 @@ message HotelRes{
 
 message Room{
     string  roomId          = 1;
-    string  roomType        = 2;
-    int32   pricePerNight   = 3;
-    bool    availability    = 4;
+    string  hotelId         = 2;
+    string  roomType        = 3;
+    int32   pricePerNight   = 4;
+    bool    availability    = 5;
 }
 
 message RoomRequest{
-    string  roomType        = 1;
-    int32   pricePerNight   = 2;
-    bool    availability    = 3;
+    string  hotelId         = 1;
+    string  roomType        = 2;
+    int32   pricePerNight   = 3;
+    bool    availability    = 4;
 }
 
 message RoomResponse{

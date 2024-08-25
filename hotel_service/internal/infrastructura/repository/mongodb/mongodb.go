@@ -1,11 +1,11 @@
 package mongodb
 
 import (
+	"fmt" // qo'shing
+	"log"
 	"context"
 	"hotel_service/internal/entity/hotel"
 	"hotel_service/internal/infrastructura/repository"
-	"log"
-
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -13,19 +13,20 @@ import (
 
 type HotelMongodb struct {
 	client     *mongo.Client
-	collection *mongo.Collection
+	hotelcollection *mongo.Collection
+	roomcollection *mongo.Collection
 	ctx        context.Context
 }
 
-func NewHotelMongodb(client *mongo.Client, collection *mongo.Collection) repository.HotelRepository {
-	return &HotelMongodb{client: client, collection: collection}
+func NewHotelMongodb(client *mongo.Client, hotelcollection *mongo.Collection, roomcollection *mongo.Collection) repository.HotelRepository {
+	return &HotelMongodb{client: client, hotelcollection: hotelcollection, roomcollection: roomcollection}
 }
 
 func (h *HotelMongodb) AddHotel(req hotel.HotelRequest) (*hotel.HotelResponse, error) {
-	res, err := h.collection.InsertOne(h.ctx, req)
+	res, err := h.hotelcollection.InsertOne(h.ctx, req)
 	if err != nil {
 		log.Println("Error inserting hotel:", err)
-		return nil, err
+		return nil, fmt.Errorf("failed to insert hotel: %w", err)
 	}
 
 	insertedId := res.InsertedID.(primitive.ObjectID).Hex()
@@ -33,20 +34,21 @@ func (h *HotelMongodb) AddHotel(req hotel.HotelRequest) (*hotel.HotelResponse, e
 	return &hotel.HotelResponse{HotelID: insertedId}, nil
 }
 
-func (h *HotelMongodb) GetbyId(req hotel.HotelResponse) (*hotel.Hotel, error) {
+func (h *HotelMongodb) GetbyId(req string) (*hotel.Hotel, error) {
 	var res hotel.Hotel
-	id, err := primitive.ObjectIDFromHex(req.HotelID)
+	id, err := primitive.ObjectIDFromHex(req)
 	if err != nil {
 		log.Println("objectid error")
-		return nil, err
+		return nil, fmt.Errorf("invalid objectid format: %w", err)
 	}
 
-	err = h.collection.FindOne(h.ctx, bson.M{"_id": id}).Decode(&res)
+	err = h.hotelcollection.FindOne(h.ctx, bson.M{"_id": id}).Decode(&res)
 	if err != nil{
 		if err == mongo.ErrNoDocuments{
 			log.Println("hotel not found")
-			return nil, err
+			return nil, fmt.Errorf("hotel not found: %w", err)
 		}
+		return nil, fmt.Errorf("error finding hotel: %w", err)
 	}
 	return &res, nil
 }
@@ -54,17 +56,17 @@ func (h *HotelMongodb) GetbyId(req hotel.HotelResponse) (*hotel.Hotel, error) {
 func (h *HotelMongodb) GetAll()(*[]hotel.Hotel, error){
 	var resHotels []hotel.Hotel
 
-	cursor, err := h.collection.Find(h.ctx, bson.M{})
+	cursor, err := h.hotelcollection.Find(h.ctx, bson.M{})
 	if err != nil {
 		log.Println("failed to get all hotel")
-		return nil, err
+		return nil, fmt.Errorf("failed to get all hotels: %w", err)
 	}
 
 	for cursor.Next(h.ctx){
 		var res hotel.Hotel
 		if err := cursor.Decode(&res); err != nil {
 			log.Println("Failed to decode item:", err)
-			return nil, err
+			return nil, fmt.Errorf("failed to decode hotel: %w", err)
 		}
 
 		resHotels =  append(resHotels, res)
@@ -72,7 +74,7 @@ func (h *HotelMongodb) GetAll()(*[]hotel.Hotel, error){
 
 	if err := cursor.Err(); err != nil {
 		log.Println("Cursor error:", err)
-		return nil, err
+		return nil, fmt.Errorf("cursor error: %w", err)
 	}
 	return &resHotels, nil
 }
@@ -81,7 +83,7 @@ func (h *HotelMongodb) UpdateHotel(req hotel.Hotel) error {
 	id, err := primitive.ObjectIDFromHex(req.HotelID)
 	if err != nil {
 		log.Println("Invalid ObjectID format:", err)
-		return err
+		return fmt.Errorf("invalid objectid format: %w", err)
 	}
 
 	filter := bson.M{"_id": id}
@@ -94,15 +96,15 @@ func (h *HotelMongodb) UpdateHotel(req hotel.Hotel) error {
 		},
 	}
 
-	res, err := h.collection.UpdateOne(h.ctx, filter, update)
+	res, err := h.hotelcollection.UpdateOne(h.ctx, filter, update)
 	if err != nil {
 		log.Println("Error updating hotel:", err)
-		return err
+		return fmt.Errorf("failed to update hotel: %w", err)
 	}
 
 	if res.MatchedCount == 0 {
 		log.Println("No hotel found with the given ID")
-		return mongo.ErrNoDocuments
+		return fmt.Errorf("no hotel found with the given ID: %w", mongo.ErrNoDocuments)
 	}
 
 	return nil
@@ -112,30 +114,30 @@ func (h *HotelMongodb) DeleteHotel(hotelID string) error {
 	id, err := primitive.ObjectIDFromHex(hotelID)
 	if err != nil {
 		log.Println("Invalid ObjectID format:", err)
-		return err
+		return fmt.Errorf("invalid objectid format: %w", err)
 	}
 
 	filter := bson.M{"_id": id}
 
-	res, err := h.collection.DeleteOne(h.ctx, filter)
+	res, err := h.hotelcollection.DeleteOne(h.ctx, filter)
 	if err != nil {
 		log.Println("Error deleting hotel:", err)
-		return err
+		return fmt.Errorf("failed to delete hotel: %w", err)
 	}
 
 	if res.DeletedCount == 0 {
 		log.Println("No hotel found with the given ID")
-		return mongo.ErrNoDocuments
+		return fmt.Errorf("no hotel found with the given ID: %w", mongo.ErrNoDocuments)
 	}
 
 	return nil
 }
 
 func (h *HotelMongodb) CreateRoom(req hotel.RoomRequest) (*hotel.RoomResponse, error) {
-	res, err := h.collection.InsertOne(h.ctx, req)
+	res, err := h.roomcollection.InsertOne(h.ctx, req)
 	if err != nil {
 		log.Println("Error inserting room:", err)
-		return nil, err
+		return nil, fmt.Errorf("failed to insert room: %w", err)
 	}
 
 	insertedId := res.InsertedID.(primitive.ObjectID).Hex()
@@ -148,17 +150,18 @@ func (h *HotelMongodb) GetRoomById(req hotel.RoomResponse) (*hotel.Room, error) 
 	id, err := primitive.ObjectIDFromHex(req.RoomID)
 	if err != nil {
 		log.Println("Invalid ObjectID format:", err)
-		return nil, err
+		return nil, fmt.Errorf("invalid objectid format: %w", err)
 	}
 
-	err = h.collection.FindOne(h.ctx, bson.M{"_id": id}).Decode(&res)
+	err = h.roomcollection.FindOne(h.ctx, bson.M{"_id": id}).Decode(&res)
+	fmt.Println(res.HotelID)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
 			log.Println("Room not found")
-			return nil, err
+			return nil, fmt.Errorf("room not found: %w", err)
 		}
 		log.Println("Error finding room:", err)
-		return nil, err
+		return nil, fmt.Errorf("failed to find room: %w", err)
 	}
 
 	return &res, nil
@@ -167,24 +170,24 @@ func (h *HotelMongodb) GetRoomById(req hotel.RoomResponse) (*hotel.Room, error) 
 func (h *HotelMongodb) GetAllRooms() (*[]hotel.Room, error) {
 	var resRooms []hotel.Room
 
-	cursor, err := h.collection.Find(h.ctx, bson.M{})
+	cursor, err := h.roomcollection.Find(h.ctx, bson.M{})
 	if err != nil {
 		log.Println("Failed to get all rooms:", err)
-		return nil, err
+		return nil, fmt.Errorf("failed to get all rooms: %w", err)
 	}
 
 	for cursor.Next(h.ctx) {
 		var res hotel.Room
 		if err := cursor.Decode(&res); err != nil {
 			log.Println("Failed to decode room:", err)
-			return nil, err
+			return nil, fmt.Errorf("failed to decode room: %w", err)
 		}
 		resRooms = append(resRooms, res)
 	}
 
 	if err := cursor.Err(); err != nil {
 		log.Println("Cursor error:", err)
-		return nil, err
+		return nil, fmt.Errorf("cursor error: %w", err)
 	}
 
 	return &resRooms, nil
@@ -194,7 +197,7 @@ func (h *HotelMongodb) UpdateRoom(req hotel.Room) error {
 	id, err := primitive.ObjectIDFromHex(req.RoomID)
 	if err != nil {
 		log.Println("Invalid ObjectID format:", err)
-		return err
+		return fmt.Errorf("invalid objectid format: %w", err)
 	}
 
 	filter := bson.M{"_id": id}
@@ -206,15 +209,15 @@ func (h *HotelMongodb) UpdateRoom(req hotel.Room) error {
 		},
 	}
 
-	res, err := h.collection.UpdateOne(h.ctx, filter, update)
+	res, err := h.roomcollection.UpdateOne(h.ctx, filter, update)
 	if err != nil {
 		log.Println("Error updating room:", err)
-		return err
+		return fmt.Errorf("failed to update room: %w", err)
 	}
 
 	if res.MatchedCount == 0 {
 		log.Println("No room found with the given ID")
-		return mongo.ErrNoDocuments
+		return fmt.Errorf("no room found with the given ID: %w", mongo.ErrNoDocuments)
 	}
 
 	return nil
@@ -224,23 +227,21 @@ func (h *HotelMongodb) DeleteRoom(roomID string) error {
 	id, err := primitive.ObjectIDFromHex(roomID)
 	if err != nil {
 		log.Println("Invalid ObjectID format:", err)
-		return err
+		return fmt.Errorf("invalid objectid format: %w", err)
 	}
 
 	filter := bson.M{"_id": id}
 
-	res, err := h.collection.DeleteOne(h.ctx, filter)
+	res, err := h.roomcollection.DeleteOne(h.ctx, filter)
 	if err != nil {
 		log.Println("Error deleting room:", err)
-		return err
+		return fmt.Errorf("failed to delete room: %w", err)
 	}
 
 	if res.DeletedCount == 0 {
 		log.Println("No room found with the given ID")
-		return mongo.ErrNoDocuments
+		return fmt.Errorf("no room found with the given ID: %w", mongo.ErrNoDocuments)
 	}
 
 	return nil
 }
-
-

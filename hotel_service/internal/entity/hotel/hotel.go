@@ -31,7 +31,8 @@ type HotelRes struct {
 }
 
 type Room struct {
-    RoomID         string `json:"roomId" bson:"roomId"`
+    RoomID         string `json:"roomId" bson:"_id"`
+    HotelID        string `json:"hotelId" bson:"hotel_id,omitempty"`
     RoomType       string `json:"roomType" bson:"roomType"`
     PricePerNight  int32  `json:"pricePerNight" bson:"pricePerNight"`
     Availability   bool   `json:"availability" bson:"availability"`
@@ -39,12 +40,13 @@ type Room struct {
 
 type RoomRequest struct {
     RoomType      string `json:"roomType" bson:"roomType"`
+    HotelID       string `json:"hotelId" bson:"hotel_id,omitempty"`
     PricePerNight int32  `json:"pricePerNight" bson:"pricePerNight"`
     Availability  bool   `json:"availability" bson:"availability"`
 }
 
 type RoomResponse struct {
-    RoomID string `json:"roomId" bson:"roomId"`
+    RoomID string `json:"roomId" bson:"_id"`
 }
 
 type ListRooms struct {

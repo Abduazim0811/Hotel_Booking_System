@@ -34,9 +34,7 @@ func (s *Service) CreateHotel(ctx context.Context, req *hotelproto.HotelRequest)
 }
 
 func (s *Service) GetbyIdHotel(ctx context.Context, req *hotelproto.HotelResponse) (*hotelproto.Hotel, error){
-	var hotelreq hotel.HotelResponse
-	hotelreq.HotelID = req.HotelId
-	res, err := s.service.Getbyidhotel(hotelreq)
+	res, err := s.service.Getbyidhotel(req.HotelId)
 	if err != nil {
 		log.Println("get by id hotel error")
 		return nil, fmt.Errorf("error get by id hotel: %v", err)
@@ -106,6 +104,11 @@ func (s *Service) CreateRoom(ctx context.Context, req *hotelproto.RoomRequest)(*
 	roomreq.PricePerNight = req.PricePerNight
 	roomreq.RoomType = req.RoomType
 
+	_, err := s.service.Getbyidhotel(req.HotelId)
+	if err != nil {
+		log.Println("Hotel id not found")
+		return nil, fmt.Errorf("hotel id not found: %v", err)
+	}
 	res, err := s.service.Createroom(roomreq)
 	if err != nil {
 		log.Println("room created error")
@@ -158,7 +161,13 @@ func (s *Service) UpdateRoom(ctx context.Context,req *hotelproto.Room) (*hotelpr
 	roomreq.Availability = req.Availability
 	roomreq.PricePerNight = req.PricePerNight
 
-	err := s.service.Updateroom(roomreq)
+	_, err := s.service.Getbyidhotel(req.HotelId)
+	if err != nil {
+		log.Println("Hotel id not found")
+		return nil, fmt.Errorf("hotel id not found: %v", err)
+	}
+
+	err = s.service.Updateroom(roomreq)
 	if err != nil {
 		log.Println("update room error")
 		return nil, fmt.Errorf("update room error: %v", err)

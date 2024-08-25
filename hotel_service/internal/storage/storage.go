@@ -18,33 +18,35 @@ import (
 	"google.golang.org/grpc"
 )
 
-func NewMongodb() (*mongo.Client, *mongo.Collection, error) {
+func NewMongodb() (*mongo.Client, *mongo.Collection, *mongo.Collection, error) {
 	clientOptions := options.Client().ApplyURI(os.Getenv("mongo_url"))
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
 	client, err := mongo.Connect(ctx, clientOptions)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 
 	err = client.Ping(ctx, nil)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 
-	collection := client.Database("Hotels").Collection("hotel")
-	return client, collection, nil
+	hotelCollection := client.Database("Hotels").Collection("hotel")
+	roomCollection := client.Database("Hotels").Collection("room")
+
+	return client, hotelCollection, roomCollection, nil
 }
 
 func Connection() {
-	client, collection, err := NewMongodb()
+	client, hotelCollection, roomCollection, err := NewMongodb()
 	if err != nil {
 		log.Println("connection mongodb error:", err)
 		return
 	}
 
-	repo := mongodb.NewHotelMongodb(client, collection)
+	repo := mongodb.NewHotelMongodb(client, hotelCollection, roomCollection)
 	service := service.NewHotelService(repo)
 	handler := hotelservice.HotelGrpcService(service)
 

@@ -17,7 +17,7 @@ func (h *HotelService) Createhotel(req hotel.HotelRequest)(*hotel.HotelResponse,
 	return h.repo.AddHotel(req)
 }
 
-func (h *HotelService) Getbyidhotel(req hotel.HotelResponse)(*hotel.Hotel, error){
+func (h *HotelService) Getbyidhotel(req string)(*hotel.Hotel, error){
 	return h.repo.GetbyId(req)
 }
 
