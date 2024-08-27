@@ -4,6 +4,7 @@ import "user_service/internal/entity/user"
 
 type UserRepository interface {
 	AddUser(req user.UserRequest) (*user.UserResponse, error)
+	GetbyEmail(email string)(*user.User, error)
 	GetbyIdUser(req user.GetUserRequest) (*user.User, error)
 	GetAll() (*user.ListUser, error)
 	UpdateUser(req user.UpdateUserReq)error

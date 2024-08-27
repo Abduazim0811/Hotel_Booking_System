@@ -7,7 +7,7 @@ import (
 	userservice "user_service/service/user_service"
 	"user_service/userproto"
 
-	"github.com/twmb/franz-go/pkg/kgo"
+	 "github.com/twmb/franz-go/pkg/kgo"
 
 )
 
@@ -75,7 +75,7 @@ func (u *ConsumerUser) Create(req []byte) error {
 		Email:    req1.Email,
 		Password: req1.Password,
 	}
-	_, err := u.C.CreateUser(u.Ctx, &newreq)
+	_, err := u.C.Register(u.Ctx, &newreq)
 	if err != nil {
 		log.Println(err)
 		return err
@@ -91,7 +91,7 @@ func (u *ConsumerUser) Update(req []byte) error {
 		return err
 	}
 	var newreq = userproto.UpdateUserReq{
-		UserId:   req1.UserId,
+		Id:   req1.Id,
 		Username: req1.Username,
 		Age:      req1.Age,
 		Email:    req1.Email,

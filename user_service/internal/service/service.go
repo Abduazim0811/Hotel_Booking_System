@@ -17,7 +17,11 @@ func (u *UserService) Createuser(req user.UserRequest) (*user.UserResponse, erro
 	return u.repo.AddUser(req)
 }
 
-func (u *UserService) GetByIdUser(req user.GetUserRequest) (*user.User, error) {
+func (u *UserService) GetByEmailUser(email string)(*user.User, error){
+	return u.repo.GetbyEmail(email)
+}
+
+func (u *UserService) GetByIduser(req user.GetUserRequest) (*user.User, error) {
 	return u.repo.GetbyIdUser(req)
 }
 

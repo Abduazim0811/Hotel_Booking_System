@@ -1,0 +1,70 @@
+syntax = "proto3";
+
+option go_package = "protos/bookingproto";
+
+
+import "google/protobuf/timestamp.proto";
+
+message BookingRequest {
+    int32                       userid          = 1;
+    string                      hotelid         = 2;
+    string                      roomId          = 3;
+    string                      roomtype        = 4;
+    google.protobuf.Timestamp   checkInDate     = 5;
+    google.protobuf.Timestamp   checkOutDate    = 6;
+    int32                       totalAmount     = 7;
+}
+
+message BookingResponse{
+    string                      bookingId       = 1;
+    int32                       userId          = 2;
+    string                      hotelId         = 3;
+    string                      roomId          = 4;
+    string                      roomtype        = 5;
+    google.protobuf.Timestamp   checkInDate     = 6;
+    google.protobuf.Timestamp   checkOutDate    = 7;
+    int32                       totalAmount     = 8;
+    string                      status          = 9;
+}
+
+message GetRequest{
+    string                      bookingId       = 1;
+}
+
+message UpdateRequest{
+    string                      bookingId       = 1;
+    string                      roomId          = 2;
+    string                      roomtype        = 3;
+    google.protobuf.Timestamp   checkInDate     = 4;
+    google.protobuf.Timestamp   checkOutDate    = 5;
+    string                      status          = 6;
+}
+
+message DeleteResponse{
+    string                      message         = 1;
+    string                      bookingId       = 2;
+}
+
+message GetUsersRequst{
+    int32                       userId          = 1;
+}
+
+message GetUsersResponse{
+    string                      bookingId       = 1;
+    string                      hotelId         = 2;
+    string                      roomId          = 3;
+    string                      roomType        = 4;
+    google.protobuf.Timestamp   checkInDate     = 5;
+    google.protobuf.Timestamp   checkOutDate    = 6;
+    int32                       totalAmount     = 7;
+    string                      status          = 8;
+}
+
+
+service BookingService{
+    rpc CreateBooking(BookingRequest) returns(BookingResponse);
+    rpc GetbyIdBooking(GetRequest) returns(BookingResponse);
+    rpc UpdateBooking(UpdateRequest) returns(BookingResponse);
+    rpc DeleteBooking(GetRequest) returns(DeleteResponse);
+    rpc GetUsersBooking(GetUsersRequst) returns(GetUsersResponse);
+}

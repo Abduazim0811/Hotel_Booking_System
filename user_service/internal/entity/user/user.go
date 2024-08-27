@@ -1,7 +1,7 @@
 package user
 
 type User struct {
-    ID       string `json:"id" bson:"_id"`
+    ID       int32 `json:"id" bson:"_id"`
     Username string `json:"username" bson:"username"`
     Age      int32  `json:"age" bson:"age"`
     Email    string `json:"email" bson:"email"`
@@ -17,7 +17,7 @@ type UserRequest struct {
 }
 
 type UserResponse struct {
-    UserID   string `json:"user_id" bson:"user_id"`
+    Id       int32  `json:"user_id" bson:"user_id"`
     Username string `json:"username" bson:"username"`
     Age      int32  `json:"age" bson:"age"`
     Email    string `json:"email" bson:"email"`
@@ -43,7 +43,7 @@ type Res struct {
 }
 
 type GetUserRequest struct {
-    ID string `json:"id" bson:"_id"`
+    ID int32 `json:"id" bson:"_id"`
 }
 
 type Empty struct{}
@@ -53,7 +53,7 @@ type ListUser struct {
 }
 
 type UpdateUserReq struct {
-    UserID   string `json:"user_id" bson:"user_id"`
+    Id       int32 `json:"user_id" bson:"user_id"`
     Username string `json:"username" bson:"username"`
     Age      int32  `json:"age" bson:"age"`
     Email    string `json:"email" bson:"email"`
@@ -64,7 +64,7 @@ type UpdateUserRes struct {
 }
 
 type UpdatePasswordReq struct {
-    UserID     string `json:"user_id" bson:"user_id"`
+    Id          int32 `json:"user_id" bson:"user_id"`
     OldPassword string `json:"old_password" bson:"old_password"`
     NewPassword string `json:"new_password" bson:"new_password"`
 }

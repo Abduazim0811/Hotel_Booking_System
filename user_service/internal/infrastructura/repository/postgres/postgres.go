@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
 	"user_service/internal/entity/user"
 	"user_service/internal/infrastructura/repository"
@@ -27,17 +28,38 @@ func (u *UserPostgres) AddUser(req user.UserRequest) (*user.UserResponse, error)
 		Suffix("RETURNING userid, username, age, email").
 		PlaceholderFormat(squirrel.Dollar).ToSql()
 	if err != nil {
-		log.Println("error generating SQL for AddUser:", err)
-		return nil, err
+		return nil, fmt.Errorf("error generating SQL for AddUser: %w", err)
 	}
 
 	row := u.db.QueryRow(sql, args...)
-	if err := row.Scan(&res.UserID, &res.Username, &res.Age, &res.Email); err != nil {
-		log.Println("error scanning result in AddUser:", err)
-		return nil, err
+	if err := row.Scan(&res.Id, &res.Username, &res.Age, &res.Email); err != nil {
+		return nil, fmt.Errorf("error scanning result in AddUser: %w", err)
 	}
 
 	return &res, nil
+}
+
+func (u *UserPostgres) GetbyEmail(email string)(*user.User, error){
+	var res user.User
+	sql, args, err := squirrel.
+		Select("*").
+		From("users").
+		Where(squirrel.Eq{"email" : email}).
+		PlaceholderFormat(squirrel.Dollar).ToSql()
+	if err != nil {
+		log.Println("email not found")
+		return nil, fmt.Errorf("email not found")
+	}
+
+	row := u.db.QueryRow(sql, args...)
+	if err := row.Scan(&res.ID, &res.Username, &res.Age, &res.Email, &res.Password); err != nil{
+		log.Println("scan error")
+		return nil, fmt.Errorf("scan error")
+	}
+
+	return &res, nil
+
+
 }
 
 func (u *UserPostgres) GetbyIdUser(req user.GetUserRequest) (*user.User, error) {
@@ -48,18 +70,15 @@ func (u *UserPostgres) GetbyIdUser(req user.GetUserRequest) (*user.User, error) 
 		Where(squirrel.Eq{"userid": req.ID}).
 		PlaceholderFormat(squirrel.Dollar).ToSql()
 	if err != nil {
-		log.Println("error generating SQL for GetByIdUser:", err)
-		return nil, err
+		return nil, fmt.Errorf("error generating SQL for GetByIdUser: %w", err)
 	}
 
 	row := u.db.QueryRow(sqls, args...)
 	if err := row.Scan(&res.ID, &res.Username, &res.Age, &res.Email, &res.Password); err != nil {
 		if err == sql.ErrNoRows {
-			log.Println("no user found for GetByIdUser:", err)
-			return nil, nil
+			return nil, fmt.Errorf("no user found for GetByIdUser: %w", err)
 		}
-		log.Println("error scanning result in GetByIdUser:", err)
-		return nil, err
+		return nil, fmt.Errorf("error scanning result in GetByIdUser: %w", err)
 	}
 
 	return &res, nil
@@ -71,14 +90,12 @@ func (u *UserPostgres) GetAll() (*user.ListUser, error) {
 		From("users").
 		PlaceholderFormat(squirrel.Dollar).ToSql()
 	if err != nil {
-		log.Println("error generating SQL for GetAll:", err)
-		return nil, err
+		return nil, fmt.Errorf("error generating SQL for GetAll: %w", err)
 	}
 
 	rows, err := u.db.Query(sql, args...)
 	if err != nil {
-		log.Println("error executing query for GetAll:", err)
-		return nil, err
+		return nil, fmt.Errorf("error executing query for GetAll: %w", err)
 	}
 	defer rows.Close()
 
@@ -86,15 +103,13 @@ func (u *UserPostgres) GetAll() (*user.ListUser, error) {
 	for rows.Next() {
 		var u user.User
 		if err := rows.Scan(&u.ID, &u.Username, &u.Age, &u.Email, &u.Password); err != nil {
-			log.Println("error scanning row in GetAll:", err)
-			continue
+			return nil, fmt.Errorf("error scanning row in GetAll: %w", err)
 		}
 		users = append(users, u)
 	}
 
 	if err = rows.Err(); err != nil {
-		log.Println("error iterating over rows in GetAll:", err)
-		return nil, err
+		return nil, fmt.Errorf("error iterating over rows in GetAll: %w", err)
 	}
 
 	return &user.ListUser{User: users}, nil
@@ -106,17 +121,15 @@ func (u *UserPostgres) UpdateUser(req user.UpdateUserReq) error {
 		Set("username", req.Username).
 		Set("age", req.Age).
 		Set("email", req.Email).
-		Where(squirrel.Eq{"userid": req.UserID}).
+		Where(squirrel.Eq{"userid": req.Id}).
 		PlaceholderFormat(squirrel.Dollar).ToSql()
 	if err != nil {
-		log.Println("error generating SQL for UpdateUser:", err)
-		return err
+		return fmt.Errorf("error generating SQL for UpdateUser: %w", err)
 	}
 
 	_, err = u.db.Exec(sql, args...)
 	if err != nil {
-		log.Println("error executing SQL in UpdateUser:", err)
-		return err
+		return fmt.Errorf("error executing SQL in UpdateUser: %w", err)
 	}
 
 	return nil
@@ -127,47 +140,41 @@ func (u *UserPostgres) UpdatePassword(req user.UpdatePasswordReq) error {
 	sqlSelect, argsSelect, err := squirrel.
 		Select("password").
 		From("users").
-		Where(squirrel.Eq{"userid": req.UserID}).
+		Where(squirrel.Eq{"userid": req.Id}).
 		PlaceholderFormat(squirrel.Dollar).
 		ToSql()
 	if err != nil {
-		log.Println("error generating SQL for password retrieval:", err)
-		return err
+		return fmt.Errorf("error generating SQL for password retrieval: %w", err)
 	}
 
 	err = u.db.QueryRow(sqlSelect, argsSelect...).Scan(&currentPassword)
 	if err != nil {
-		log.Println("error retrieving current password:", err)
-		return err
+		return fmt.Errorf("error retrieving current password: %w", err)
 	}
 
 	err = bcrypt.CompareHashAndPassword([]byte(currentPassword), []byte(req.OldPassword))
 	if err != nil {
-		log.Println("error comparing old password:", err)
-		return err
+		return fmt.Errorf("error comparing old password: %w", err)
 	}
 
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.NewPassword), bcrypt.DefaultCost)
 	if err != nil {
-		log.Println("error hashing new password:", err)
-		return err
+		return fmt.Errorf("error hashing new password: %w", err)
 	}
 
 	sqlUpdate, argsUpdate, err := squirrel.
 		Update("users").
 		Set("password", string(hashedPassword)).
-		Where(squirrel.Eq{"userid": req.UserID}).
+		Where(squirrel.Eq{"userid": req.Id}).
 		PlaceholderFormat(squirrel.Dollar).
 		ToSql()
 	if err != nil {
-		log.Println("error generating SQL for UpdatePassword:", err)
-		return err
+		return fmt.Errorf("error generating SQL for UpdatePassword: %w", err)
 	}
 
 	_, err = u.db.Exec(sqlUpdate, argsUpdate...)
 	if err != nil {
-		log.Println("error executing SQL in UpdatePassword:", err)
-		return err
+		return fmt.Errorf("error executing SQL in UpdatePassword: %w", err)
 	}
 
 	return nil
@@ -179,14 +186,12 @@ func (u *UserPostgres) DeleteUser(req user.GetUserRequest) error {
 		Where(squirrel.Eq{"userid": req.ID}).
 		PlaceholderFormat(squirrel.Dollar).ToSql()
 	if err != nil {
-		log.Println("error generating SQL for DeleteUser:", err)
-		return err
+		return fmt.Errorf("error generating SQL for DeleteUser: %w", err)
 	}
 
 	_, err = u.db.Exec(sql, args...)
 	if err != nil {
-		log.Println("error executing SQL in DeleteUser:", err)
-		return err
+		return fmt.Errorf("error executing SQL in DeleteUser: %w", err)
 	}
 
 	return nil
