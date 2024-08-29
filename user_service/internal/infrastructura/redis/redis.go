@@ -3,6 +3,7 @@ package redis
 import (
 	"context"
 	"fmt"
+	"log"
 	"strconv"
 	"user_service/userproto"
 
@@ -29,13 +30,17 @@ func (r *RedisClient) SetHash(key string, values map[string]interface{}) error {
 	return r.Client.HMSet(ctx, key, values).Err()
 }
 
-func (r *RedisClient) VerifyEmail(ctx context.Context, email string, usercode int64) (*userproto.User, error) {
+func (r *RedisClient) VerifyEmail(ctx context.Context, email string, usercode string) (*userproto.User, error) {
 	code, err := r.Client.HGet(ctx, email, "code").Int64()
 	if err != nil {
 		fmt.Println(code, err)
 		return nil, fmt.Errorf("error HGET:%v", err)
 	}
-	if code == usercode {
+	u_code, err := strconv.Atoi(usercode)
+	if err != nil {
+		log.Fatal(err)
+	}
+	if code == int64(u_code) {
 		result, err := r.Client.HGetAll(ctx, email).Result()
 		if err != nil {
 			return nil, fmt.Errorf("error HGETALL: %v", err)

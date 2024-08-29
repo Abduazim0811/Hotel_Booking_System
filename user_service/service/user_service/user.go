@@ -74,7 +74,7 @@ func (s *Service) Register(ctx context.Context, req *userproto.UserRequest) (*us
 }
 
 func (s *Service) VerifyCode(ctx context.Context, req *userproto.Req) (*userproto.UserResponse, error) {
-	res, err := s.redis.VerifyEmail(ctx, req.Email, int64(req.Code))
+	res, err := s.redis.VerifyEmail(ctx, req.Email, req.Code)
 	if err != nil {
 		log.Println("verify code error: ")
 		return nil, fmt.Errorf("verify code error: %v", err)
@@ -118,7 +118,7 @@ func (s *Service) Login(ctx context.Context, req *userproto.LoginRequest) (*user
 		return nil, err
 	}
 
-	return &userproto.LoginResponse{Token: token, ExpiresIn: "s"}, nil
+	return &userproto.LoginResponse{Token: token}, nil
 }
 
 func (s *Service) GetByIdUser(ctx context.Context, req *userproto.GetUserRequest) (*userproto.User, error) {

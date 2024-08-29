@@ -1047,7 +1047,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/userproto.LoginRequest"
+                            "$ref": "#/definitions/userproto.Req"
                         }
                     }
                 ],
@@ -1625,10 +1625,18 @@ const docTemplate = `{
         "userproto.LoginResponse": {
             "type": "object",
             "properties": {
-                "expiresIn": {
+                "token": {
+                    "type": "string"
+                }
+            }
+        },
+        "userproto.Req": {
+            "type": "object",
+            "properties": {
+                "code": {
                     "type": "string"
                 },
-                "token": {
+                "email": {
                     "type": "string"
                 }
             }

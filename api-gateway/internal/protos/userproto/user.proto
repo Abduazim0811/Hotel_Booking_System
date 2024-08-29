@@ -32,7 +32,6 @@ message LoginRequest{
 
 message LoginResponse{
     string token = 1;
-    string expiresIn = 2;
 }
 
 message GetUserRequest{
@@ -64,7 +63,7 @@ message UpdatePasswordReq{
 
 message Req{
     string email = 1;
-    int32 code = 2;
+    string code = 2;
 }
 
 service UserService {

@@ -35,7 +35,7 @@ type LoginResponse struct {
 
 type Req struct {
     Email string `json:"email" bson:"email"`
-    Code  int32  `json:"code" bson:"code"`
+    Code  string  `json:"code" bson:"code"`
 }
 
 type Res struct {

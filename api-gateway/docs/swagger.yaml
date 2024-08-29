@@ -235,9 +235,14 @@ definitions:
     type: object
   userproto.LoginResponse:
     properties:
-      expiresIn:
-        type: string
       token:
+        type: string
+    type: object
+  userproto.Req:
+    properties:
+      code:
+        type: string
+      email:
         type: string
     type: object
   userproto.UpdatePasswordReq:
@@ -961,7 +966,7 @@ paths:
         name: login
         required: true
         schema:
-          $ref: '#/definitions/userproto.LoginRequest'
+          $ref: '#/definitions/userproto.Req'
       produces:
       - application/json
       responses:

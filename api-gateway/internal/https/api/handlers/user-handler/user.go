@@ -71,7 +71,7 @@ func (u *Userhandler) CreateUser(c *gin.Context) {
 // @Tags user
 // @Accept json
 // @Produce json
-// @Param login body userproto.LoginRequest true "Login request body"
+// @Param login body userproto.Req true "Login request body"
 // @Success 200 {object} userproto.UserResponse
 // @Failure 400 {object} string
 // @Failure 500 {object} string
