@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
@@ -23,14 +22,14 @@ func Protected() gin.HandlerFunc {
 			return
 		}
 
-		tokenString := strings.TrimPrefix(authHeader, "Bearer ")
-		if tokenString == authHeader {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token format"})
-			c.Abort()
-			return
-		}
+		// tokenString := strings.TrimPrefix(authHeader, "Bearer ")
+		// if tokenString == authHeader {
+		// 	c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token format"})
+		// 	c.Abort()
+		// 	return
+		// }
 
-		err := verifyToken(tokenString)
+		err := verifyToken(authHeader)
 		if err != nil {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token: " + err.Error()})
 			c.Abort()
