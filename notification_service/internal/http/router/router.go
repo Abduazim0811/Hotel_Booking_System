@@ -23,7 +23,7 @@ func NewRouter() {
 	go Grpc()
 
 	fmt.Println("Server started on port 8083")
-	if err := r.Run("localhost:8083"); err != nil {
+	if err := r.Run("notification_service:8083"); err != nil {
 		log.Fatal(err)
 	}
 }

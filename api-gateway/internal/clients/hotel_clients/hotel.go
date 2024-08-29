@@ -9,7 +9,7 @@ import (
 )
 
 func DialHotelGrpc() hotelproto.HotelServiceClient {
-	conn, err := grpc.NewClient("localhost:9999", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.NewClient("hotel_service:9999", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatal("failed to dial grpc client hotel:", err)
 	}

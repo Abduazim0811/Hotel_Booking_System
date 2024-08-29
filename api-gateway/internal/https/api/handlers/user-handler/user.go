@@ -2,8 +2,11 @@ package userhandler
 
 import (
 	_ "api-gateway/docs"
+	producer "api-gateway/internal/kafka"
 	"api-gateway/internal/protos/userproto"
 	"context"
+	"encoding/json"
+	"log"
 	"net/http"
 	"strconv"
 	"time"
@@ -48,6 +51,14 @@ func (u *Userhandler) CreateUser(c *gin.Context) {
 	res, err := u.Clientuser.Register(ctx, &req)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	byted, err := json.Marshal(&req)
+	if err != nil {
+		log.Println(err)
+	}
+	if err := producer.Producer("create", byted); err != nil {
+		log.Println(err)
 		return
 	}
 
@@ -193,6 +204,14 @@ func (u *Userhandler) UpdateUsers(c *gin.Context) {
 		return
 	}
 
+	byted, err := json.Marshal(&req)
+	if err != nil {
+		log.Println(err)
+	}
+	if err := producer.Producer("update", byted); err != nil {
+		log.Println(err)
+	}
+
 	c.JSON(http.StatusOK, res)
 }
 
@@ -252,6 +271,13 @@ func (u *Userhandler) DeleteUsers(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
+	}
+	byted, err := json.Marshal(&req)
+	if err != nil {
+		log.Println(err)
+	}
+	if err := producer.Producer("delete", byted); err != nil {
+		log.Println(err)
 	}
 
 	c.JSON(http.StatusOK, res)

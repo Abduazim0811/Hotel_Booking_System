@@ -9,7 +9,7 @@ import (
 )
 
 func DialUserGrpc() userproto.UserServiceClient {
-	conn, err := grpc.NewClient("localhost:8888", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.NewClient("user_service:8888", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatal("gRPC serverga ulanishda xato:", err)
 	}

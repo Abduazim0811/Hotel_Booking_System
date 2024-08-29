@@ -38,7 +38,7 @@ func Run() {
 	}
 	defer db.Close()
 
-	redisClient := redis.NewRedisClient("localhost:6379", "", 0)
+	redisClient := redis.NewRedisClient("redis:6379", "", 0)
 
 	repo := postgres.NewUserPostgres(db)
 	s := service.NewUserService(repo)

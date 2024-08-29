@@ -89,7 +89,7 @@ func Router() *http.Server {
 	}
 
 	server := &http.Server{
-		Addr:    ":7777",
+		Addr:    "api_gateway:7777",
 		Handler: router,
 	}
 

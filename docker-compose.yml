@@ -4,15 +4,14 @@ services:
   api_gateway:
     build: ./api_gateway
     # dockerfile: dockerfile.multistage
-    container_name: api_gateway1
+    container_name: api_gateway
     ports:
-      - 8085:8085
+      - 7777:7777
     depends_on:
       - booking_service
       - hotel_service
       - user_service
       - broker
-      - redis
     networks:
       - mynetwork
 
@@ -22,11 +21,12 @@ services:
     container_name: user_service_container
     image: user_service_image
     environment:
-      - PG_URL=postgres://postgres:2005@user_postgres:5432/hotel?sslmode=disable
+      - PG_URL=postgres://postgres:Abdu0811@user_postgres:5432/imtihon_5?sslmode=disable
     ports:
-      - 8080:8080
+      - 8888:8888
     depends_on:
       - user_postgres
+      - redis
       - broker
     networks:
       - mynetwork
@@ -37,11 +37,11 @@ services:
     container_name: hotel_service_container
     image: hotel_service_image
     environment:
-      - PG_URL=postgres://postgres:2005@hotel_postgres:5432/hotels?sslmode=disable
+      - MONGO_URL=mongodb://hotel_mongo:27017/hotels
     ports:
-      - 8081:8081
+      - 9999:9999
     depends_on:
-      - hotel_postgres
+      - hotel_mongo
     networks:
       - mynetwork
 
@@ -51,12 +51,11 @@ services:
     container_name: booking_service_container
     image: booking_service_image
     environment:
-      - PG_URL=postgres://postgres:2005@booking_postgres:5432/booking?sslmode=disable
+      - MONGO_URL=mongodb://booking_mongo:27017/booking
     ports:
-      - 8082:8082
+      - 9090:9090
     depends_on:
-      - booking_postgres
-      - migrate_booking
+      - booking_mongo
       - broker
     networks:
       - mynetwork
@@ -68,7 +67,7 @@ services:
     # dockerfile: dockerfile.multistage
     ports:
       - "8083:8083"
-      - "50051:50051"
+      - "8887:8887"
     depends_on:
       - broker
     networks:
@@ -103,8 +102,8 @@ services:
     container_name: user_postgres
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: 2005
-      POSTGRES_DB: hotel
+      POSTGRES_PASSWORD: Abdu0811
+      POSTGRES_DB: imtihon_5
       PGDATA: /var/lib/postgresql/data
     volumes:
       - user-db-data:/var/lib/postgresql/data
@@ -124,76 +123,33 @@ services:
     image: migrate/migrate
     volumes:
       - ./user_service/migrations:/migrations
-    command: ["-path", "/migrations", "-database", "postgres://postgres:2005@user_postgres:5432/hotel?sslmode=disable", "up"]
+    command: ["-path", "/migrations", "-database", "postgres://postgres:Abdu0811@user_postgres:5432/imtihon_5?sslmode=disable", "up"]
     depends_on:
       user_postgres:
         condition: service_healthy
     networks:
       - mynetwork
-
-  hotel_postgres:
-    image: postgres:14-alpine
-    container_name: hotel_postgres
+  hotel_mongo:
+    image: mongo:latest
+    container_name: hotel_mongo
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: 2005
-      POSTGRES_DB: hotels
-      PGDATA: /var/lib/postgresql/data
-    volumes:
-      - hotel-db-data:/var/lib/postgresql/data
-      - ./hotel_service/migrations:/docker-entrypoint-initdb.d
+      MONGO_INITDB_DATABASE: Hotels
     ports:
-      - "5433:5432"
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d hotels || exit 1"]
-      interval: 30s
-      retries: 3
-      start_period: 30s
-      timeout: 10s
-    networks:
-      - mynetwork
-
-  migrate_hotel:
-    image: migrate/migrate
+      - "27018:27017"
     volumes:
-      - ./hotel_service/migrations:/migrations
-    command: ["-path", "/migrations", "-database", "postgres://postgres:2005@hotel_postgres:5432/hotels?sslmode=disable", "up"]
-    depends_on:
-      hotel_postgres:
-        condition: service_healthy
+      - hotel-db-data:/data/db
     networks:
       - mynetwork
 
-  booking_postgres:
-    image: postgres:14-alpine
-    container_name: booking_postgres
+  booking_mongo:
+    image: mongo:latest
+    container_name: booking_mongo
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: 2005
-      POSTGRES_DB: booking
-      PGDATA: /var/lib/postgresql/data
-    volumes:
-      - booking-db-data:/var/lib/postgresql/data
-      - ./booking_service/migrations:/docker-entrypoint-initdb.d
+      MONGO_INITDB_DATABASE: Booking
     ports:
-      - "5434:5432"
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d booking || exit 1"]
-      interval: 30s
-      retries: 3
-      start_period: 30s
-      timeout: 10s
-    networks:
-      - mynetwork
-
-  migrate_booking:
-    image: migrate/migrate
+      - "27019:27017"
     volumes:
-      - ./booking_service/migrations:/migrations
-    command: ["-path", "/migrations", "-database", "postgres://postgres:2005@booking_postgres:5432/booking?sslmode=disable", "up"]
-    depends_on:
-      booking_postgres:
-        condition: service_healthy
+      - booking-db-data:/data/db
     networks:
       - mynetwork
 
