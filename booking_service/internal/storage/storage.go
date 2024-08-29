@@ -1,6 +1,7 @@
 package storage
 
 import (
+	"booking_service/internal/infrastructura/kafka/consumer"
 	"booking_service/internal/infrastructura/repository/mongodb"
 	"booking_service/internal/service"
 	"booking_service/protos/bookingproto"
@@ -11,40 +12,41 @@ import (
 	"os"
 	"time"
 
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 	_ "github.com/joho/godotenv/autoload"
 	_ "github.com/lib/pq"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 	"google.golang.org/grpc"
 )
 
-func NewMongodb() (*mongo.Client, *mongo.Collection, error) {
+func NewMongodb() (*mongo.Client, *mongo.Collection, *mongo.Collection, error) {
 	clientOptions := options.Client().ApplyURI(os.Getenv("mongo_url"))
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
 	client, err := mongo.Connect(ctx, clientOptions)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil,nil, err
 	}
 
 	err = client.Ping(ctx, nil)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil,nil, err
 	}
 
 	collection := client.Database("Booking").Collection("booking")
-	return client, collection, nil
+	waitingcollection := client.Database("Waitings").Collection("waiting")
+	return client, collection,waitingcollection, nil
 }
 
 func Connection() {
-	client, collection, err := NewMongodb()
+	client, collection,waitingcollection, err := NewMongodb()
 	if err != nil {
 		log.Println("connection mongodb error:", err)
 		return
 	}
 
-	repo := mongodb.NewBookingMongodb(client, collection)
+	repo := mongodb.NewBookingMongodb(client, collection, waitingcollection)
 
 	s := service.NewBookingService(repo)
 
@@ -58,6 +60,12 @@ func Connection() {
 		log.Fatal("Unable to listen :", err)
 	}
 	defer lis.Close()
+
+	consum := consumer.NewBookingConsumer(handler)
+
+	go func ()  {
+		consum.Consumer()
+	}()
 
 	log.Println("Server is listening on port ", os.Getenv("server_url"))
 	if err = server.Serve(lis); err != nil {

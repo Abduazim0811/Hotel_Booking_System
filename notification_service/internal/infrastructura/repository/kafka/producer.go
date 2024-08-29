@@ -1,0 +1,97 @@
+package kafka
+
+import (
+	"context"
+	"log"
+	"net/http"
+	"os"
+	"time"
+
+	"github.com/gin-gonic/gin"
+	"github.com/segmentio/kafka-go"
+	"github.com/twmb/franz-go/pkg/kadm"
+	"github.com/twmb/franz-go/pkg/kgo"
+)
+
+func Producer(key, message string) error {
+	topic := "notification"
+	brokerAddress := "broker:29092"
+
+	kafkaClient, err := kgo.NewClient(
+		kgo.SeedBrokers(brokerAddress),
+		kgo.WithLogger(kgo.BasicLogger(os.Stdout, kgo.LogLevelWarn, func() string { return time.Now().Format(time.RFC3339) })),
+	)
+	if err != nil {
+		log.Printf("Failed to create Kafka client: %v", err)
+		return err
+	}
+	defer kafkaClient.Close()
+
+	adminClient := kadm.NewClient(kafkaClient)
+
+	ctx := context.Background()
+	topics, err := adminClient.ListTopics(ctx)
+	if err != nil {
+		log.Printf("Failed to list Kafka topics: %v", err)
+		return err
+	}
+
+	_, exists := topics[topic]
+	if !exists {
+		_, err = adminClient.CreateTopics(ctx, 1, 1, nil, topic)
+		if err != nil {
+			log.Printf("Failed to create Kafka topic: %v", err)
+			return err
+		}
+		log.Printf("Topic %s created", topic)
+	} else {
+		log.Printf("Topic %s already exists", topic)
+	}
+
+	w := kafka.Writer{
+		Addr:     kafka.TCP(brokerAddress),
+		Topic:    topic,
+		Balancer: &kafka.LeastBytes{},
+	}
+	defer w.Close()
+
+	var i int
+
+	for {
+		err := w.WriteMessages(ctx,
+			kafka.Message{
+				Key:   []byte(key),
+				Value: []byte(message),
+			},
+		)
+		if err != nil {
+			log.Println("Error writing message:", err)
+		} else {
+			log.Println("Message sent to Kafka")
+			return nil
+		}
+		i++
+		time.Sleep(5 * time.Second)
+	}
+}
+
+func RegisterRoutes(router *gin.Engine) {
+	router.POST("/producer", func(c *gin.Context) {
+		var req struct {
+			Key     string `json:"key"`
+			Message string `json:"message"`
+		}
+
+		if err := c.BindJSON(&req); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+
+		if err := Producer(req.Key, req.Message); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{"message": "Message sent successfully"})
+	})
+}

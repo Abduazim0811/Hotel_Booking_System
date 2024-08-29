@@ -60,6 +60,48 @@ message GetUsersResponse{
     string                      status          = 8;
 }
 
+message CreateWaitingList{
+    int32                       user_id         = 1;
+    string                      user_email      = 2;
+    string                      room_type       = 3;
+    string                      hotelId         = 4;
+    google.protobuf.Timestamp   checkInDate     = 5;
+    google.protobuf.Timestamp   checkOutDate    = 6;
+}
+
+message UpdateWaitingListRequest{
+    int32                       user_id         = 1;
+    string                      id              = 2;
+    string                      room_type       = 3;
+    string                      hotelId         = 4;
+    google.protobuf.Timestamp   checkInDate     = 5;
+    google.protobuf.Timestamp   checkOutDate    = 6;
+}
+
+message GetWaitingResponse{
+    int32                       user_id         = 1;
+    string                      user_email      = 2;
+    string                      room_type       = 3;
+    string                      hotelId         = 4;
+    google.protobuf.Timestamp   checkInDate     = 5;
+    string                      status          = 6;
+    string                      id              = 7;
+    google.protobuf.Timestamp   checkOutDate    = 8;
+}
+
+message WaitingList{
+    repeated GetWaitingResponse users = 1;
+}
+
+message WaitingResponse{
+    string                      message         = 1;
+}
+
+message GetWaitingRequest{
+    string                      id              = 1;
+}
+message Empty{}
+
 
 service BookingService{
     rpc CreateBooking(BookingRequest) returns(BookingResponse);
@@ -67,4 +109,9 @@ service BookingService{
     rpc UpdateBooking(UpdateRequest) returns(BookingResponse);
     rpc DeleteBooking(GetRequest) returns(DeleteResponse);
     rpc GetUsersBooking(GetUsersRequst) returns(GetUsersResponse);
+    rpc CreateWaiting(CreateWaitingList) returns(WaitingResponse);
+    rpc GetWaitingList(GetWaitingRequest) returns(GetWaitingResponse);
+    rpc GetAllWaiting(Empty) returns(WaitingList);
+    rpc UpdateWaiting(UpdateWaitingListRequest) returns(WaitingResponse);
+    rpc DeleteWaiting(GetWaitingRequest) returns(WaitingResponse);
 }

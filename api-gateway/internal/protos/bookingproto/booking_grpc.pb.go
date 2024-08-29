@@ -24,6 +24,11 @@ const (
 	BookingService_UpdateBooking_FullMethodName   = "/BookingService/UpdateBooking"
 	BookingService_DeleteBooking_FullMethodName   = "/BookingService/DeleteBooking"
 	BookingService_GetUsersBooking_FullMethodName = "/BookingService/GetUsersBooking"
+	BookingService_CreateWaiting_FullMethodName   = "/BookingService/CreateWaiting"
+	BookingService_GetWaitingList_FullMethodName  = "/BookingService/GetWaitingList"
+	BookingService_GetAllWaiting_FullMethodName   = "/BookingService/GetAllWaiting"
+	BookingService_UpdateWaiting_FullMethodName   = "/BookingService/UpdateWaiting"
+	BookingService_DeleteWaiting_FullMethodName   = "/BookingService/DeleteWaiting"
 )
 
 // BookingServiceClient is the client API for BookingService service.
@@ -35,6 +40,11 @@ type BookingServiceClient interface {
 	UpdateBooking(ctx context.Context, in *UpdateRequest, opts ...grpc.CallOption) (*BookingResponse, error)
 	DeleteBooking(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*DeleteResponse, error)
 	GetUsersBooking(ctx context.Context, in *GetUsersRequst, opts ...grpc.CallOption) (*GetUsersResponse, error)
+	CreateWaiting(ctx context.Context, in *CreateWaitingList, opts ...grpc.CallOption) (*WaitingResponse, error)
+	GetWaitingList(ctx context.Context, in *GetWaitingRequest, opts ...grpc.CallOption) (*GetWaitingResponse, error)
+	GetAllWaiting(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*WaitingList, error)
+	UpdateWaiting(ctx context.Context, in *UpdateWaitingListRequest, opts ...grpc.CallOption) (*WaitingResponse, error)
+	DeleteWaiting(ctx context.Context, in *GetWaitingRequest, opts ...grpc.CallOption) (*WaitingResponse, error)
 }
 
 type bookingServiceClient struct {
@@ -95,6 +105,56 @@ func (c *bookingServiceClient) GetUsersBooking(ctx context.Context, in *GetUsers
 	return out, nil
 }
 
+func (c *bookingServiceClient) CreateWaiting(ctx context.Context, in *CreateWaitingList, opts ...grpc.CallOption) (*WaitingResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(WaitingResponse)
+	err := c.cc.Invoke(ctx, BookingService_CreateWaiting_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *bookingServiceClient) GetWaitingList(ctx context.Context, in *GetWaitingRequest, opts ...grpc.CallOption) (*GetWaitingResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetWaitingResponse)
+	err := c.cc.Invoke(ctx, BookingService_GetWaitingList_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *bookingServiceClient) GetAllWaiting(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*WaitingList, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(WaitingList)
+	err := c.cc.Invoke(ctx, BookingService_GetAllWaiting_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *bookingServiceClient) UpdateWaiting(ctx context.Context, in *UpdateWaitingListRequest, opts ...grpc.CallOption) (*WaitingResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(WaitingResponse)
+	err := c.cc.Invoke(ctx, BookingService_UpdateWaiting_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *bookingServiceClient) DeleteWaiting(ctx context.Context, in *GetWaitingRequest, opts ...grpc.CallOption) (*WaitingResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(WaitingResponse)
+	err := c.cc.Invoke(ctx, BookingService_DeleteWaiting_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // BookingServiceServer is the server API for BookingService service.
 // All implementations must embed UnimplementedBookingServiceServer
 // for forward compatibility
@@ -104,6 +164,11 @@ type BookingServiceServer interface {
 	UpdateBooking(context.Context, *UpdateRequest) (*BookingResponse, error)
 	DeleteBooking(context.Context, *GetRequest) (*DeleteResponse, error)
 	GetUsersBooking(context.Context, *GetUsersRequst) (*GetUsersResponse, error)
+	CreateWaiting(context.Context, *CreateWaitingList) (*WaitingResponse, error)
+	GetWaitingList(context.Context, *GetWaitingRequest) (*GetWaitingResponse, error)
+	GetAllWaiting(context.Context, *Empty) (*WaitingList, error)
+	UpdateWaiting(context.Context, *UpdateWaitingListRequest) (*WaitingResponse, error)
+	DeleteWaiting(context.Context, *GetWaitingRequest) (*WaitingResponse, error)
 	mustEmbedUnimplementedBookingServiceServer()
 }
 
@@ -125,6 +190,21 @@ func (UnimplementedBookingServiceServer) DeleteBooking(context.Context, *GetRequ
 }
 func (UnimplementedBookingServiceServer) GetUsersBooking(context.Context, *GetUsersRequst) (*GetUsersResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetUsersBooking not implemented")
+}
+func (UnimplementedBookingServiceServer) CreateWaiting(context.Context, *CreateWaitingList) (*WaitingResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateWaiting not implemented")
+}
+func (UnimplementedBookingServiceServer) GetWaitingList(context.Context, *GetWaitingRequest) (*GetWaitingResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetWaitingList not implemented")
+}
+func (UnimplementedBookingServiceServer) GetAllWaiting(context.Context, *Empty) (*WaitingList, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetAllWaiting not implemented")
+}
+func (UnimplementedBookingServiceServer) UpdateWaiting(context.Context, *UpdateWaitingListRequest) (*WaitingResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateWaiting not implemented")
+}
+func (UnimplementedBookingServiceServer) DeleteWaiting(context.Context, *GetWaitingRequest) (*WaitingResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteWaiting not implemented")
 }
 func (UnimplementedBookingServiceServer) mustEmbedUnimplementedBookingServiceServer() {}
 
@@ -229,6 +309,96 @@ func _BookingService_GetUsersBooking_Handler(srv interface{}, ctx context.Contex
 	return interceptor(ctx, in, info, handler)
 }
 
+func _BookingService_CreateWaiting_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateWaitingList)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BookingServiceServer).CreateWaiting(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: BookingService_CreateWaiting_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BookingServiceServer).CreateWaiting(ctx, req.(*CreateWaitingList))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _BookingService_GetWaitingList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetWaitingRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BookingServiceServer).GetWaitingList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: BookingService_GetWaitingList_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BookingServiceServer).GetWaitingList(ctx, req.(*GetWaitingRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _BookingService_GetAllWaiting_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BookingServiceServer).GetAllWaiting(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: BookingService_GetAllWaiting_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BookingServiceServer).GetAllWaiting(ctx, req.(*Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _BookingService_UpdateWaiting_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateWaitingListRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BookingServiceServer).UpdateWaiting(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: BookingService_UpdateWaiting_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BookingServiceServer).UpdateWaiting(ctx, req.(*UpdateWaitingListRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _BookingService_DeleteWaiting_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetWaitingRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BookingServiceServer).DeleteWaiting(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: BookingService_DeleteWaiting_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BookingServiceServer).DeleteWaiting(ctx, req.(*GetWaitingRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // BookingService_ServiceDesc is the grpc.ServiceDesc for BookingService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -255,6 +425,26 @@ var BookingService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetUsersBooking",
 			Handler:    _BookingService_GetUsersBooking_Handler,
+		},
+		{
+			MethodName: "CreateWaiting",
+			Handler:    _BookingService_CreateWaiting_Handler,
+		},
+		{
+			MethodName: "GetWaitingList",
+			Handler:    _BookingService_GetWaitingList_Handler,
+		},
+		{
+			MethodName: "GetAllWaiting",
+			Handler:    _BookingService_GetAllWaiting_Handler,
+		},
+		{
+			MethodName: "UpdateWaiting",
+			Handler:    _BookingService_UpdateWaiting_Handler,
+		},
+		{
+			MethodName: "DeleteWaiting",
+			Handler:    _BookingService_DeleteWaiting_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

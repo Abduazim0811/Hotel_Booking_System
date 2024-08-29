@@ -1,0 +1,79 @@
+syntax = "proto3";
+
+option go_package = "./userproto";
+
+message User{
+    int32 id = 1;
+    string username = 2;
+    int32  age = 3;
+    string email = 4;
+    string password = 5;
+}
+
+message UserRequest{
+    string username = 1;
+    int32 age = 2;
+    string password = 3;
+    string confirm_password = 4;
+    string email = 5;
+}
+
+message UserResponse{
+    int32 id = 1;
+    int32 age = 2;
+    string username = 3;
+    string email = 4;
+}
+
+message LoginRequest{
+    string email = 1;
+    string password = 2;
+}
+
+message LoginResponse{
+    string token = 1;
+    string expiresIn = 2;
+}
+
+message GetUserRequest{
+    int32 id = 1;
+}
+
+message UserEmpty{}
+
+message ListUser{
+   repeated User user = 1;
+}
+
+message UpdateUserReq{
+    int32 id = 1;
+    int32 age = 2;
+    string username = 3;
+    string email = 4;
+}
+
+message UpdateUserRes{
+    string message = 1;
+}
+
+message UpdatePasswordReq{
+    int32 id = 1;
+    string old_password = 2;
+    string new_password = 3;
+}
+
+message Req{
+    string email = 1;
+    int32 code = 2;
+}
+
+service UserService {
+    rpc Register(UserRequest) returns(UpdateUserRes);
+    rpc VerifyCode(Req) returns(UserResponse);
+    rpc Login(LoginRequest) returns(LoginResponse);
+    rpc GetByIdUser(GetUserRequest) returns(User);
+    rpc GetUsers(UserEmpty) returns(ListUser);
+    rpc UpdateUser(UpdateUserReq) returns (UpdateUserRes);
+    rpc UpdatePassword(UpdatePasswordReq) returns(UpdateUserRes);
+    rpc DeleteUser(GetUserRequest) returns (UpdateUserRes);
+}

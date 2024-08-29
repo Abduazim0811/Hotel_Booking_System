@@ -32,3 +32,22 @@ func (b *BookingService) Deletebooking(req booking.GetRequest)(*booking.DeleteRe
 func (b *BookingService) Getbyidusers(req booking.GetUsersRequest)([]*booking.BookingResponse, error){
 	return b.repo.GetByUserId(req)
 }
+func (b *BookingService) CreateWaiting(req booking.CreateWaitingList) error {
+	return b.repo.AddWaiting(req)
+}
+
+func (b *BookingService) GetbyIdwaitingList(id string) (*booking.GetWaitingResponse, error) {
+	return b.repo.GetbyIdwaitingList(id)
+}
+
+func (b *BookingService) GetAllWaiting() (*booking.WaitingList, error) {
+	return b.repo.GetAllWaiting()
+}
+
+func (b *BookingService) UpdateWaiting(req booking.UpdateWaitingListRequest) error {
+	return b.repo.UpdateWaiting(req)
+}
+
+func (b *BookingService) DeleteWaiting(req booking.GetWaitingRequest) error {
+	return b.repo.DeleteWaiting(req)
+}

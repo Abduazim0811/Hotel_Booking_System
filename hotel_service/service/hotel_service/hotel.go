@@ -135,8 +135,8 @@ func (s *Service) GetbyIdRoom(ctx context.Context,req *hotelproto.RoomResponse) 
 	}, nil
 }
 
-func (s *Service) GetAllRooms(ctx context.Context, _ *hotelproto.HotelEmpty) (*hotelproto.ListRooms, error){
-	res, err := s.service.Getallroom()
+func (s *Service) GetAllRooms(ctx context.Context, req *hotelproto.HotelResponse) (*hotelproto.ListRooms, error){
+	res, err := s.service.Getallroom(req.HotelId)
 	if err != nil {
 		log.Println("get all room error")
 		return nil, fmt.Errorf("get all room error: %v", err)

@@ -35,6 +35,7 @@ func (u *UserPostgres) AddUser(req user.UserRequest) (*user.UserResponse, error)
 	if err := row.Scan(&res.Id, &res.Username, &res.Age, &res.Email); err != nil {
 		return nil, fmt.Errorf("error scanning result in AddUser: %w", err)
 	}
+	fmt.Println(res.Age)
 
 	return &res, nil
 }
@@ -54,7 +55,7 @@ func (u *UserPostgres) GetbyEmail(email string)(*user.User, error){
 	row := u.db.QueryRow(sql, args...)
 	if err := row.Scan(&res.ID, &res.Username, &res.Age, &res.Email, &res.Password); err != nil{
 		log.Println("scan error")
-		return nil, fmt.Errorf("scan error")
+		return nil, fmt.Errorf("scan error: %v", err)
 	}
 
 	return &res, nil
@@ -181,6 +182,16 @@ func (u *UserPostgres) UpdatePassword(req user.UpdatePasswordReq) error {
 }
 
 func (u *UserPostgres) DeleteUser(req user.GetUserRequest) error {
+	var exists bool
+	err := u.db.QueryRow("SELECT EXISTS(SELECT 1 FROM users WHERE userid = $1)", req.ID).Scan(&exists)
+	if err != nil {
+		return fmt.Errorf("error checking user existence: %w", err)
+	}
+
+	if !exists {
+		return fmt.Errorf("user with ID %d does not exist", req.ID)
+	}
+
 	sql, args, err := squirrel.
 		Delete("users").
 		Where(squirrel.Eq{"userid": req.ID}).

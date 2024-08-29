@@ -154,7 +154,6 @@ func (h *HotelMongodb) GetRoomById(req hotel.RoomResponse) (*hotel.Room, error) 
 	}
 
 	err = h.roomcollection.FindOne(h.ctx, bson.M{"_id": id}).Decode(&res)
-	fmt.Println(res.HotelID)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
 			log.Println("Room not found")
@@ -167,10 +166,12 @@ func (h *HotelMongodb) GetRoomById(req hotel.RoomResponse) (*hotel.Room, error) 
 	return &res, nil
 }
 
-func (h *HotelMongodb) GetAllRooms() (*[]hotel.Room, error) {
+
+
+func (h *HotelMongodb) GetAllRooms(id string) (*[]hotel.Room, error) {
 	var resRooms []hotel.Room
 
-	cursor, err := h.roomcollection.Find(h.ctx, bson.M{})
+	cursor, err := h.roomcollection.Find(h.ctx, bson.M{"hotel_id": id})
 	if err != nil {
 		log.Println("Failed to get all rooms:", err)
 		return nil, fmt.Errorf("failed to get all rooms: %w", err)

@@ -15,11 +15,12 @@ import (
 type BookingMongodb struct {
 	client       *mongo.Client
 	b_collection *mongo.Collection
+	w_collection *mongo.Collection
 	ctx          context.Context
 }
 
-func NewBookingMongodb(client *mongo.Client, collection *mongo.Collection) repository.BookingRepository {
-	return &BookingMongodb{client: client, b_collection: collection}
+func NewBookingMongodb(client *mongo.Client, collection *mongo.Collection, waitingcollection *mongo.Collection) repository.BookingRepository {
+	return &BookingMongodb{client: client, b_collection: collection, w_collection: waitingcollection}
 }
 
 func (b *BookingMongodb) Create(req booking.BookingRequest) (*booking.BookingResponse, error) {
@@ -149,4 +150,109 @@ func (b *BookingMongodb) GetByUserId(req booking.GetUsersRequest) ([]*booking.Bo
 	}
 
 	return res, nil
+}
+
+func (b *BookingMongodb) AddWaiting(req booking.CreateWaitingList) error {
+	_, err := b.w_collection.InsertOne(b.ctx, req)
+	if err != nil {
+		log.Println("error create waiting")
+		return fmt.Errorf("error create waiting")
+	}
+
+	return nil
+}
+
+func (b *BookingMongodb) GetbyIdwaitingList(id string) (*booking.GetWaitingResponse, error) {
+	waitingid, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		log.Println("Invalid waiting list ID:", err)
+		return nil, fmt.Errorf("invalid waiting list  id error: %v", err)
+	}
+	var res booking.GetWaitingResponse
+
+	err = b.w_collection.FindOne(b.ctx, bson.M{"_id": waitingid}).Decode(&res)
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			log.Println("Booking not found")
+			return nil, fmt.Errorf("waiting list not found")
+		}
+		log.Println("Error finding waiting list:", err)
+		return nil, fmt.Errorf("error waiting list")
+	}
+
+	return &res, nil
+}
+
+func (b *BookingMongodb) GetAllWaiting() (*booking.WaitingList, error) {
+	var res []booking.GetWaitingResponse
+
+	cursor, err := b.w_collection.Find(b.ctx, bson.M{})
+	if err != nil {
+		log.Println("Error finding all waiting lists:", err)
+		return nil, fmt.Errorf("error finding all waiting lists")
+	}
+	defer cursor.Close(b.ctx)
+
+	for cursor.Next(b.ctx) {
+		var waiting booking.GetWaitingResponse
+		if err := cursor.Decode(&waiting); err != nil {
+			log.Println("Error decoding waiting list:", err)
+			return nil, fmt.Errorf("error decoding waiting list")
+		}
+		res = append(res, waiting)
+	}
+
+	if err := cursor.Err(); err != nil {
+		log.Println("Cursor error:", err)
+		return nil, fmt.Errorf("cursor error")
+	}
+
+	return &booking.WaitingList{Users: res}, nil
+}
+
+func (b *BookingMongodb) UpdateWaiting(req booking.UpdateWaitingListRequest) error {
+	waitingID, err := primitive.ObjectIDFromHex(req.ID)
+	if err != nil {
+		log.Println("Invalid waiting list ID:", err)
+		return fmt.Errorf("invalid waiting list ID")
+	}
+
+	update := bson.M{
+		"$set": bson.M{
+			"user_id":       req.UserID,
+			"room_type":     req.RoomType,
+			"hotel_id":      req.HotelID,
+			"check_in_date": req.CheckInDate,
+			"check_out_date": req.CheckOutDate,
+		},
+	}
+
+	_, err = b.w_collection.UpdateOne(b.ctx, bson.M{"_id": waitingID}, update)
+	if err != nil {
+		log.Println("Error updating waiting list:", err)
+		return fmt.Errorf("error updating waiting list: %v", err)
+	}
+
+	return nil
+}
+
+func (b *BookingMongodb) DeleteWaiting(req booking.GetWaitingRequest)error{
+	waitingID, err := primitive.ObjectIDFromHex(req.ID)
+	if err != nil {
+		log.Println("Invalid waiting list ID:", err)
+		return fmt.Errorf("invalid waiting list ID: %v", err)
+	}
+
+	res, err := b.w_collection.DeleteOne(b.ctx, bson.M{"_id": waitingID})
+	if err != nil {
+		log.Println("Error deleting booking:", err)
+		return fmt.Errorf("error deleting booking:%v", err)
+	}
+
+	if res.DeletedCount == 0 {
+		log.Println("Booking not found")
+		return  mongo.ErrNoDocuments
+	}
+	return nil
+
 }

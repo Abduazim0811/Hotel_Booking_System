@@ -8,4 +8,10 @@ type BookingRepository interface {
 	Update(req booking.UpdateRequest) (*booking.BookingResponse, error)
 	Delete(req booking.GetRequest) (*booking.DeleteResponse, error)
 	GetByUserId(req booking.GetUsersRequest) ([]*booking.BookingResponse, error)
+
+	AddWaiting(req booking.CreateWaitingList) error
+	GetbyIdwaitingList(id string) (*booking.GetWaitingResponse, error)
+	GetAllWaiting() (*booking.WaitingList, error)
+	UpdateWaiting(req booking.UpdateWaitingListRequest) error
+	DeleteWaiting(req booking.GetWaitingRequest)error
 }

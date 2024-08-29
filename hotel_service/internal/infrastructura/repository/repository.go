@@ -10,7 +10,7 @@ type HotelRepository interface{
 	DeleteHotel(hotelID string) error
 	CreateRoom(req hotel.RoomRequest) (*hotel.RoomResponse, error)
 	GetRoomById(req hotel.RoomResponse) (*hotel.Room, error)
-	GetAllRooms() (*[]hotel.Room, error)
+	GetAllRooms(id string) (*[]hotel.Room, error)
 	UpdateRoom(req hotel.Room) error
 	DeleteRoom(roomID string) error
 }

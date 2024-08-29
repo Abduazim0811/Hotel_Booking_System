@@ -21,8 +21,8 @@ type Service struct {
 	redis   *redis.RedisClient
 }
 
-func NewGrpcService(service *service.UserService) *Service {
-	return &Service{service: service}
+func NewGrpcService(service *service.UserService, redis *redis.RedisClient) *Service {
+	return &Service{service: service, redis: redis}
 }
 
 func (s *Service) Register(ctx context.Context, req *userproto.UserRequest) (*userproto.UpdateUserRes, error) {
@@ -61,6 +61,7 @@ func (s *Service) Register(ctx context.Context, req *userproto.UserRequest) (*us
 	}
 
 	if s.redis == nil {
+		log.Println("redis error", err)
 		return nil, fmt.Errorf("redis client is not initialized")
 	}
 
@@ -96,6 +97,7 @@ func (s *Service) VerifyCode(ctx context.Context, req *userproto.Req) (*userprot
 		Id: userres.Id,
 		Username: userres.Username,
 		Email: userres.Email,
+		Age: userres.Age,
 	}, nil
 }
 

@@ -5,6 +5,7 @@ import (
 	"log"
 	"net"
 	"os"
+	"user_service/internal/infrastructura/redis"
 	"user_service/internal/infrastructura/repository/postgres"
 	"user_service/internal/service"
 	userservice "user_service/service/user_service"
@@ -37,12 +38,14 @@ func Run() {
 	}
 	defer db.Close()
 
+	redisClient := redis.NewRedisClient("localhost:6379", "", 0)
+
 	repo := postgres.NewUserPostgres(db)
 	s := service.NewUserService(repo)
-	user_handler := userservice.NewGrpcService(s)
+	user_handler := userservice.NewGrpcService(s, redisClient)
 	server := grpc.NewServer()
 	userproto.RegisterUserServiceServer(server, user_handler)
-	
+
 	lis, err := net.Listen("tcp", os.Getenv("server_url"))
 	if err != nil {
 		log.Fatal("Unable to listen :", err)

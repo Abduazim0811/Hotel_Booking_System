@@ -41,8 +41,9 @@ func(h *HotelService) Getbyidroom(req hotel.RoomResponse)(*hotel.Room, error){
 	return h.repo.GetRoomById(req)
 }
 
-func (h *HotelService) Getallroom()(*[]hotel.Room, error){
-	return h.repo.GetAllRooms()
+
+func (h *HotelService) Getallroom(id string)(*[]hotel.Room, error){
+	return h.repo.GetAllRooms(id)
 }
 
 func (h *HotelService) Updateroom(req hotel.Room)error{

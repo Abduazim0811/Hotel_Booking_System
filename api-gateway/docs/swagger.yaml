@@ -1,0 +1,1106 @@
+definitions:
+  booking.BookingRequest:
+    properties:
+      checkInDate:
+        type: string
+      checkOutDate:
+        type: string
+      hotelid:
+        type: string
+      roomId:
+        type: string
+      roomtype:
+        type: string
+      totalAmount:
+        type: integer
+      userid:
+        type: integer
+    type: object
+  booking.BookingResponse:
+    properties:
+      bookingId:
+        type: string
+      checkInDate:
+        type: string
+      checkOutDate:
+        type: string
+      hotelId:
+        type: string
+      roomId:
+        type: string
+      roomtype:
+        type: string
+      status:
+        type: string
+      totalAmount:
+        type: integer
+      userId:
+        type: integer
+    type: object
+  booking.CreateWaitingList:
+    properties:
+      check_in_date:
+        type: string
+      check_out_date:
+        type: string
+      hotel_id:
+        type: string
+      room_type:
+        type: string
+      user_email:
+        type: string
+      user_id:
+        type: integer
+    type: object
+  booking.DeleteResponse:
+    properties:
+      bookingId:
+        type: string
+      message:
+        type: string
+    type: object
+  booking.GetUsersResponse:
+    properties:
+      bookingId:
+        type: string
+      checkInDate:
+        type: string
+      checkOutDate:
+        type: string
+      hotelId:
+        type: string
+      roomId:
+        type: string
+      roomType:
+        type: string
+      status:
+        type: string
+      totalAmount:
+        type: integer
+    type: object
+  booking.GetWaitingResponse:
+    properties:
+      check_in_date:
+        type: string
+      check_out_date:
+        type: string
+      hotel_id:
+        type: string
+      id:
+        type: string
+      room_type:
+        type: string
+      status:
+        type: string
+      user_email:
+        type: string
+      user_id:
+        type: integer
+    type: object
+  booking.UpdateRequest:
+    properties:
+      bookingId:
+        type: string
+      checkInDate:
+        type: string
+      checkOutDate:
+        type: string
+      roomId:
+        type: string
+      roomtype:
+        type: string
+      status:
+        type: string
+    type: object
+  booking.UpdateWaitingListRequest:
+    properties:
+      check_in_date:
+        type: string
+      check_out_date:
+        type: string
+      hotel_id:
+        type: string
+      id:
+        type: string
+      room_type:
+        type: string
+      user_id:
+        type: integer
+    type: object
+  booking.WaitingResponse:
+    properties:
+      message:
+        type: string
+    type: object
+  hotelproto.Hotel:
+    properties:
+      address:
+        type: string
+      hotelId:
+        type: string
+      location:
+        type: string
+      name:
+        type: string
+      rating:
+        type: integer
+    type: object
+  hotelproto.HotelRequest:
+    properties:
+      address:
+        type: string
+      location:
+        type: string
+      name:
+        type: string
+      rating:
+        type: integer
+    type: object
+  hotelproto.HotelRes:
+    properties:
+      message:
+        type: string
+    type: object
+  hotelproto.HotelResponse:
+    properties:
+      hotelId:
+        type: string
+    type: object
+  hotelproto.ListHotels:
+    properties:
+      hotel:
+        items:
+          $ref: '#/definitions/hotelproto.Hotel'
+        type: array
+    type: object
+  hotelproto.ListRooms:
+    properties:
+      room:
+        items:
+          $ref: '#/definitions/hotelproto.Room'
+        type: array
+    type: object
+  hotelproto.Room:
+    properties:
+      availability:
+        type: boolean
+      hotelId:
+        type: string
+      pricePerNight:
+        type: integer
+      roomId:
+        type: string
+      roomType:
+        type: string
+    type: object
+  hotelproto.RoomRequest:
+    properties:
+      availability:
+        type: boolean
+      hotelId:
+        type: string
+      pricePerNight:
+        type: integer
+      roomType:
+        type: string
+    type: object
+  hotelproto.RoomRes:
+    properties:
+      message:
+        type: string
+    type: object
+  hotelproto.RoomResponse:
+    properties:
+      roomId:
+        type: string
+    type: object
+  userproto.GetUserRequest:
+    properties:
+      id:
+        type: integer
+    type: object
+  userproto.ListUser:
+    properties:
+      user:
+        items:
+          $ref: '#/definitions/userproto.User'
+        type: array
+    type: object
+  userproto.LoginRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    type: object
+  userproto.LoginResponse:
+    properties:
+      expiresIn:
+        type: string
+      token:
+        type: string
+    type: object
+  userproto.UpdatePasswordReq:
+    properties:
+      id:
+        type: integer
+      new_password:
+        type: string
+      old_password:
+        type: string
+    type: object
+  userproto.UpdateUserReq:
+    properties:
+      age:
+        type: integer
+      email:
+        type: string
+      id:
+        type: integer
+      username:
+        type: string
+    type: object
+  userproto.UpdateUserRes:
+    properties:
+      message:
+        type: string
+    type: object
+  userproto.User:
+    properties:
+      age:
+        type: integer
+      email:
+        type: string
+      id:
+        type: integer
+      password:
+        type: string
+      username:
+        type: string
+    type: object
+  userproto.UserRequest:
+    properties:
+      age:
+        type: integer
+      confirm_password:
+        type: string
+      email:
+        type: string
+      password:
+        type: string
+      username:
+        type: string
+    type: object
+  userproto.UserResponse:
+    properties:
+      age:
+        type: integer
+      email:
+        type: string
+      id:
+        type: integer
+      username:
+        type: string
+    type: object
+info:
+  contact: {}
+  description: This is a sample server for a restaurant reservation system.
+  title: Hotel Booking System
+  version: "1.0"
+paths:
+  /bookings:
+    post:
+      consumes:
+      - application/json
+      description: Create a new Booking
+      parameters:
+      - description: Booking request body
+        in: body
+        name: hotel
+        required: true
+        schema:
+          $ref: '#/definitions/booking.BookingRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/booking.BookingResponse'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - Bearer: []
+      summary: Create a new booking
+      tags:
+      - Booking
+  /bookings/{id}:
+    delete:
+      description: Remove a booking from the system
+      parameters:
+      - description: Booking ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/booking.DeleteResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - Bearer: []
+      summary: Delete a booking
+      tags:
+      - Booking
+    get:
+      description: Retrieve a specific booking by its ID
+      parameters:
+      - description: Booking ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/booking.BookingResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - Bearer: []
+      summary: Get booking by ID
+      tags:
+      - Booking
+    put:
+      consumes:
+      - application/json
+      description: Update the details of an existing booking
+      parameters:
+      - description: Booking ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Updated booking details
+        in: body
+        name: booking
+        required: true
+        schema:
+          $ref: '#/definitions/booking.UpdateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/booking.BookingResponse'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - Bearer: []
+      summary: Update a booking
+      tags:
+      - Booking
+  /hotels:
+    get:
+      description: Get all hotels
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/hotelproto.ListHotels'
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - Bearer: []
+      summary: Get all hotels
+      tags:
+      - hotel
+    post:
+      consumes:
+      - application/json
+      description: Create a new hotel
+      parameters:
+      - description: Hotel request body
+        in: body
+        name: hotel
+        required: true
+        schema:
+          $ref: '#/definitions/hotelproto.HotelRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/hotelproto.HotelResponse'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - Bearer: []
+      summary: Create a new hotel
+      tags:
+      - hotel
+  /hotels/{id}:
+    delete:
+      description: Delete hotel by ID
+      parameters:
+      - description: Hotel ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/hotelproto.HotelRes'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - Bearer: []
+      summary: Delete hotel by ID
+      tags:
+      - hotel
+    get:
+      consumes:
+      - application/json
+      description: Get hotel by ID
+      parameters:
+      - description: Hotel ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/hotelproto.Hotel'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - Bearer: []
+      summary: Get hotel by ID
+      tags:
+      - hotel
+    put:
+      consumes:
+      - application/json
+      description: Update hotel by ID
+      parameters:
+      - description: Hotel ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Hotel update request body
+        in: body
+        name: hotel
+        required: true
+        schema:
+          $ref: '#/definitions/hotelproto.Hotel'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/hotelproto.HotelRes'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - Bearer: []
+      summary: Update hotel by ID
+      tags:
+      - hotel
+  /login:
+    post:
+      consumes:
+      - application/json
+      description: Login a user and get a JWT token
+      parameters:
+      - description: Login request body
+        in: body
+        name: login
+        required: true
+        schema:
+          $ref: '#/definitions/userproto.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/userproto.LoginResponse'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Login a user
+      tags:
+      - user
+  /register:
+    post:
+      consumes:
+      - application/json
+      description: Create a new user
+      parameters:
+      - description: User request body
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/userproto.UserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/userproto.UpdateUserRes'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Create a new user
+      tags:
+      - user
+  /rooms:
+    get:
+      description: Get all rooms
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/hotelproto.ListRooms'
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - Bearer: []
+      summary: Get all rooms
+      tags:
+      - room
+    post:
+      consumes:
+      - application/json
+      description: Create a new room
+      parameters:
+      - description: Room request body
+        in: body
+        name: room
+        required: true
+        schema:
+          $ref: '#/definitions/hotelproto.RoomRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/hotelproto.RoomResponse'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - Bearer: []
+      summary: Create a new room
+      tags:
+      - room
+  /rooms/{id}:
+    delete:
+      description: Delete room by ID
+      parameters:
+      - description: Room ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/hotelproto.RoomRes'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - Bearer: []
+      summary: Delete room by ID
+      tags:
+      - room
+    get:
+      description: Get room by ID
+      parameters:
+      - description: Room ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/hotelproto.Room'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - Bearer: []
+      summary: Get room by ID
+      tags:
+      - room
+    put:
+      consumes:
+      - application/json
+      description: Update room by ID
+      parameters:
+      - description: Room ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Room update request body
+        in: body
+        name: room
+        required: true
+        schema:
+          $ref: '#/definitions/hotelproto.Room'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/hotelproto.RoomRes'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - Bearer: []
+      summary: Update room by ID
+      tags:
+      - room
+  /users:
+    get:
+      consumes:
+      - application/json
+      description: Get all users
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/userproto.ListUser'
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - Bearer: []
+      summary: Get all users
+      tags:
+      - user
+    put:
+      consumes:
+      - application/json
+      description: Update a user
+      parameters:
+      - description: User request body
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/userproto.UpdateUserReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/userproto.UpdateUserRes'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - Bearer: []
+      summary: Update a user
+      tags:
+      - user
+  /users/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a user
+      parameters:
+      - description: Delete user request body
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/userproto.GetUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/userproto.UpdateUserRes'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - Bearer: []
+      summary: Delete a user
+      tags:
+      - user
+    get:
+      consumes:
+      - application/json
+      description: Get user by ID
+      parameters:
+      - description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/userproto.User'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - Bearer Auth: []
+      summary: Get user by ID
+      tags:
+      - user
+  /users/{id}/bookings:
+    get:
+      description: Retrieve all bookings made by a specific user
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/booking.GetUsersResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - Bearer: []
+      summary: Get bookings for a user
+      tags:
+      - Booking
+  /users/password/{id}:
+    put:
+      consumes:
+      - application/json
+      description: Update a user's password
+      parameters:
+      - description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Password update request body
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/userproto.UpdatePasswordReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/userproto.UpdateUserRes'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - Bearer: []
+      summary: Update a user's password
+      tags:
+      - user
+  /verifycode:
+    post:
+      consumes:
+      - application/json
+      description: Login a user and get a JWT token
+      parameters:
+      - description: Login request body
+        in: body
+        name: login
+        required: true
+        schema:
+          $ref: '#/definitions/userproto.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/userproto.UserResponse'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: VerifyCode a user
+      tags:
+      - user
+  /waitinglist:
+    post:
+      consumes:
+      - application/json
+      description: Add a new booking to the waiting list
+      parameters:
+      - description: Waiting list request body
+        in: body
+        name: waitinglist
+        required: true
+        schema:
+          $ref: '#/definitions/booking.CreateWaitingList'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/booking.WaitingResponse'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - Bearer: []
+      summary: Add a booking to the waiting list
+      tags:
+      - WaitingList
+  /waitinglist/{id}:
+    delete:
+      description: Remove an entry from the waiting list
+      parameters:
+      - description: Waiting list ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/booking.WaitingResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - Bearer: []
+      summary: Delete a waiting list entry
+      tags:
+      - WaitingList
+    get:
+      description: Retrieve a specific entry from the waiting list by its ID
+      parameters:
+      - description: Waiting list ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/booking.GetWaitingResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - Bearer: []
+      summary: Get waiting list by ID
+      tags:
+      - WaitingList
+    put:
+      consumes:
+      - application/json
+      description: Update the details of an entry in the waiting list
+      parameters:
+      - description: Waiting list ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Updated waiting list details
+        in: body
+        name: waitinglist
+        required: true
+        schema:
+          $ref: '#/definitions/booking.UpdateWaitingListRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/booking.WaitingResponse'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - Bearer: []
+      summary: Update a waiting list entry
+      tags:
+      - WaitingList
+securityDefinitions:
+  Bearer:
+    description: Enter the token in the format `Bearer {token}`
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

@@ -11,7 +11,7 @@ import (
 func DialUserGrpc() userproto.UserServiceClient {
 	conn, err := grpc.NewClient("localhost:8888", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
-		log.Fatal("failed to dial grpc client hotel:", err)
+		log.Fatal("gRPC serverga ulanishda xato:", err)
 	}
 
 	return userproto.NewUserServiceClient(conn)

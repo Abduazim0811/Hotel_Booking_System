@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
@@ -15,14 +16,19 @@ var (
 
 func Protected() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		tokenString := c.GetHeader("Authorization")
-		if tokenString == "" {
+		authHeader := c.GetHeader("Authorization")
+		if authHeader == "" {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "Missing authorization header"})
 			c.Abort()
 			return
 		}
 
-		fmt.Println("Token String:", tokenString)
+		tokenString := strings.TrimPrefix(authHeader, "Bearer ")
+		if tokenString == authHeader {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token format"})
+			c.Abort()
+			return
+		}
 
 		err := verifyToken(tokenString)
 		if err != nil {
@@ -30,6 +36,7 @@ func Protected() gin.HandlerFunc {
 			c.Abort()
 			return
 		}
+
 		c.Next()
 	}
 }
@@ -47,5 +54,6 @@ func verifyToken(tokenString string) error {
 	if !token.Valid {
 		return errors.New("token is invalid")
 	}
+
 	return nil
 }
